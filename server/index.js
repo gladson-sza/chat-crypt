@@ -1,19 +1,24 @@
+const { initExpressServer } = require('./expressServer.js');
+const { initSocketIo } = require('./webSocket.js');
+const db = require('./models');
+const { User } = require('./models');
 
-const express = require('express')
-const app = express()
-const PORT = 8080
+const PORT = 8080;
+const ADMIN = "Admin";
 
-const db = require('./models')
+db.sequelize
+  .sync()
+  .then((req) => {
+    initExpressServer(PORT).then(result => {
+      initSocketIo(result.expressServer, PORT, ADMIN);
 
-const { User } = require('./models')
+      // TODO: Remove this after development stage
+      simulateCreateDummyUser(result.app);
+    });
+});
 
-db.sequelize.sync().then((req) => {
-  app.use(express.json())
-  app.listen(
-    PORT,
-    () => console.log(`Server started at http://localhost:${PORT}/\nPress Ctrl C to kill the server execution`)
-  )
-
+// TODO: Remove this after development stage
+function simulateCreateDummyUser(app) {
   app.get('/createDummyUser', (req, res) => {
     User.create({
       name: 'Dummy',
@@ -21,10 +26,10 @@ db.sequelize.sync().then((req) => {
       password: 'password'
     }).catch((err) => {
       if (err) {
-        console.log(err)
+        console.log(err);
       }
     })
 
-    return res.status(200).send('<h1>New insertion<h1>')
-  })
-})
+    return res.status(200).send('<h1>New insertion<h1>');
+  });
+}
