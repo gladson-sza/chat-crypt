@@ -1,5 +1,8 @@
 .chats-container {
   padding: 20px;
+  min-height: 80vh;
+  max-height: 600px;
+  min-width: 600px;
 }
 
 .chat-list {

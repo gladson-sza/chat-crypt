@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import ChatHeader from '../../components/ChatHeader';
 
 import './index.css'
-import Header from '../../components/Header';
+
 import { useNavigate } from 'react-router-dom';
 
 const ChatPage = () => {
@@ -17,13 +18,13 @@ const ChatPage = () => {
   };
 
   const handleBackClick = () => {
-    navigate ('/login');
+    navigate ('/chats');
   }
 
   return (
     <div>
-      <Header onBackClick={handleBackClick} conversationName='Gladson'></Header>
-
+      <ChatHeader onBackClick={handleBackClick} conversationName='Gladson'></ChatHeader>
+      
       <div className='chat-container'>
         {messages.length === 0 ?
           <div className='message-list'>

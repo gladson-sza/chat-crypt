@@ -1,6 +1,5 @@
 .contact-item {
   display: flex;
-  align-items: center;
   flex-direction: column;
   padding: 10px;
 }
@@ -13,14 +12,19 @@
 }
 
 .contact-label {
-  flex-grow: 1;
+  padding-left: 24px;
   font-size: 16px;
   font-weight: bold;
 }
 
-.underline {
-  border-bottom: 1px solid #ddd;
-  width: 100%; /* Make the underline span the full width */
-  margin-top: 10px; /* Add margin-top to separate from the content */
+.content {
+  display: flex;
+  align-content: flex-start;
+  flex-direction: row;
 }
 
+.underline {
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  margin-top: 10px;
+}

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import './index.css';
 
-const Header = ({ onBackClick, conversationName }) => {
+const ChatHeader = ({ onBackClick, conversationName }) => {
   return (
     <div className="header-container">
       <div className="back-button" onClick={onBackClick}>
@@ -14,4 +14,4 @@ const Header = ({ onBackClick, conversationName }) => {
   );
 };
 
-export default Header;
+export default ChatHeader;
