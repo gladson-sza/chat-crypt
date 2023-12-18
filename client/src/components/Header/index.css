@@ -1,0 +1,17 @@
+.header-container {
+  background-color: #5bc0de;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.back-button {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.conversation-name {
+  font-size: 18px;
+  font-weight: bold;
+}

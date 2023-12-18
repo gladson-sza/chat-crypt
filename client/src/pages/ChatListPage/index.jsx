@@ -26,7 +26,7 @@ const ChatsPage = () => {
       <h2>My Chats</h2>
 
       {chats.length === 0 ? (
-        <p>No chats available. Start a new conversation!</p>
+        <p>Select a chat to start a new conversation</p>
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
