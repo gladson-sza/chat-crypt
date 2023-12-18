@@ -1,0 +1,21 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px; /* Adjust the positioning as needed */
+  color: #555; /* Adjust the icon color */
+}
+
+.search-input {
+  border: none;
+  background-color: #242424;
+  outline: none;
+  width: 100%;
+  padding: 8px 40px; /* Increase right padding to make room for the icon */
+  border-radius: 4px;
+  font-size: 14px;
+}

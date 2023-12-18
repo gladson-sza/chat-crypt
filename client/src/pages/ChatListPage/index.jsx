@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import ContactListModal from './../../components/ContactListModal';
+import ChatListHeader from '../../components/ChatListHeader';
+import ContactItem from '../../components/ContactItem';
+
 import './index.css';
 
+import { useNavigate } from 'react-router-dom';
+import SearchBar from '../../components/SearchBar';
+
 const ChatsPage = () => {
+  const navigate = useNavigate();
   const [chats, setChats] = useState([]);
   const [showContactList, setShowContactList] = useState(false);
 
@@ -21,12 +28,26 @@ const ChatsPage = () => {
     setShowContactList(false);
   };
 
+  const handleOnLogout = () => {
+    navigate('/login')
+  }
+
+  const handleOnSearch = (query) => {
+    console.log(query)
+  }
+
   return (
     <div className="chats-container">
-      <h2>My Chats</h2>
+      <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} />
 
       {chats.length === 0 ? (
-        <p>No chats available. Start a new conversation!</p>
+        <div>
+          <p>Search a contact to start a new conversation</p>
+          <ContactItem label='Gladson'/>
+          <ContactItem label='Ademir'/>
+          <ContactItem label='Natanael'/>
+        </div>
+
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
@@ -44,10 +65,6 @@ const ChatsPage = () => {
           ))}
         </ul>
       )}
-
-      <button className="new-conversation-button" onClick={handleNewChat}>
-        Start a New Conversation
-      </button>
 
       {showContactList && (
         <ContactListModal onSelect={handleContactSelected} />
