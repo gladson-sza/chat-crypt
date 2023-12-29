@@ -3,6 +3,7 @@ const { initSocketIo } = require('./webSocket.js');
 const { Op } = require("sequelize");
 const db = require('./models');
 const { User } = require('./models');
+const CryptoJS = require("crypto-js");
 
 const PORT = 8080;
 const ADMIN = "Admin";
@@ -14,14 +15,28 @@ db.sequelize
       initSocketIo(result.expressServer, PORT, ADMIN);
       initRoutes(result.app)
     });
-});
+  });
 
-function isEmpty(obj) {
-  for(var prop in obj) {
-      if(obj.hasOwnProperty(prop))
-          return false;
+const isEmpty = (obj) => {
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop))
+      return false;
   }
   return JSON.stringify(obj) === JSON.stringify({});
+}
+
+const toDatabasePassword = (password, createdAt) => {
+  return CryptoJS.SHA512(`${password}${createdAt}`).toString()
+}
+
+const findUserWithEmailAndPassword = async (email, password) => {
+  let user = await User.findOne({ where: { email: email } })
+  if (user !== null) {
+    let dbPassword = toDatabasePassword(password, user.createdAt)
+    if (dbPassword === user.password) return user
+  }
+
+  return null
 }
 
 const initRoutes = (app) => {
@@ -29,22 +44,22 @@ const initRoutes = (app) => {
     const body = req.body
 
     if (isEmpty(body)) {
-      return res.status(400).send({message: 'Empty request body'})
+      return res.status(400).send({ message: 'Empty request body' })
     }
 
     if (body.name === undefined) {
-      return res.status(400).send({message: "Missing \"name\" property"})
+      return res.status(400).send({ message: "Missing \"name\" property" })
     }
 
     if (body.email === undefined) {
-      return res.status(400).send({message: "Missing \"email\" property"})
+      return res.status(400).send({ message: "Missing \"email\" property" })
     }
 
     if (body.password === undefined) {
-      return res.status(400).send({message: "Missing \"password\" property"})
+      return res.status(400).send({ message: "Missing \"password\" property" })
     }
-    
-    let user = await User.findOne({where: {email: body.email}})
+
+    let user = await User.findOne({ where: { email: body.email } })
     if (user === null) {
       user = await User.create({
         name: body.name,
@@ -52,15 +67,17 @@ const initRoutes = (app) => {
         password: body.password
       })
 
-      user.password === undefined
-  
+      user = await User.findOne({ where: { email: body.email, password: body.password } })
+      user.password = toDatabasePassword(user.password, user.createdAt)
+      await user.save()
+
       return res.status(200).send({
         'id': user.id,
         'name': user.name,
         'email': user.email
       });
     } else {
-      return res.status(400).send({message: 'User already exists'})
+      return res.status(400).send({ message: 'User already exists' })
     }
   })
 
@@ -68,18 +85,18 @@ const initRoutes = (app) => {
     const body = req.body
 
     if (isEmpty(body)) {
-      return res.status(400).send({message: 'Empty request body'})
+      return res.status(400).send({ message: 'Empty request body' })
     }
 
     if (body.email === undefined) {
-      return res.status(400).send({message: "Missing \"email\" property"})
+      return res.status(400).send({ message: "Missing \"email\" property" })
     }
 
     if (body.password === undefined) {
-      return res.status(400).send({message: "Missing \"password\" property"})
+      return res.status(400).send({ message: "Missing \"password\" property" })
     }
-    
-    let user = await User.findOne({where: {email: body.email, password: body.password}})
+
+    let user = await findUserWithEmailAndPassword(body.email, body.password)
     if (user !== null) {
       return res.status(200).send({
         'id': user.id,
@@ -87,7 +104,7 @@ const initRoutes = (app) => {
         'email': user.email
       });
     } else {
-      return res.status(400).send({message: 'Wrong email or password'})
+      return res.status(400).send({ message: 'Wrong email or password' })
     }
   })
 
@@ -95,14 +112,14 @@ const initRoutes = (app) => {
     const body = req.body
 
     if (isEmpty(body)) {
-      return res.status(400).send({message: 'Empty request body'})
+      return res.status(400).send({ message: 'Empty request body' })
     }
 
     if (body.email === undefined) {
-      return res.status(400).send({message: "Missing \"email\" property"})
+      return res.status(400).send({ message: "Missing \"email\" property" })
     }
-    
-    let user = await User.findOne({where: {email: body.email}})
+
+    let user = await User.findOne({ where: { email: body.email } })
     if (user !== null) {
       return res.status(200).send({
         'id': user.id,
@@ -110,7 +127,7 @@ const initRoutes = (app) => {
         'email': user.email
       });
     } else {
-      return res.status(404).send({message: 'User not found'})
+      return res.status(404).send({ message: 'User not found' })
     }
   })
 
@@ -118,7 +135,7 @@ const initRoutes = (app) => {
     const query = req.query.q
 
     if (isEmpty(query)) {
-      return res.status(400).send({message: 'Empty request body'})
+      return res.status(400).send({ message: 'Empty request body' })
     }
 
     let users = await User.findAll({
@@ -135,7 +152,7 @@ const initRoutes = (app) => {
         }
       }));
     } else {
-      return res.status(400).send({message: 'No user found'})
+      return res.status(400).send({ message: 'No user found' })
     }
   })
 }
