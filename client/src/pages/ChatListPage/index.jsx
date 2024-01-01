@@ -2,23 +2,23 @@ import React, { useState } from 'react';
 import ContactListModal from './../../components/ContactListModal';
 import ChatListHeader from '../../components/ChatListHeader';
 import ContactItem from '../../components/ContactItem';
+import Modal from '../../components/Modal';
 
 import './index.css';
 
 import { useNavigate } from 'react-router-dom';
-import SearchBar from '../../components/SearchBar';
 
 const ChatsPage = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState([]);
   const [showContactList, setShowContactList] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleNewChat = () => {
     setShowContactList(true);
   };
 
   const handleContactSelected = (contact) => {
-    // Create a new chat with the selected contact
     const newChat = {
       contact,
       messages: [],
@@ -36,16 +36,21 @@ const ChatsPage = () => {
     console.log(query)
   }
 
+  const handleAddNewContact = () => {
+    console.log('Heheh')
+    setIsModalOpen(!isModalOpen);
+  }
+
   return (
     <div className="chats-container">
-      <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} />
-
+      {isModalOpen && <Modal onCloseModal={handleAddNewContact} />}
+      <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} onAddNewContact={handleAddNewContact} />
       {chats.length === 0 ? (
         <div>
           <p>Search a contact to start a new conversation</p>
-          <ContactItem label='Gladson'/>
-          <ContactItem label='Ademir'/>
-          <ContactItem label='Natanael'/>
+          <ContactItem imageSrc='' label='Gladson' />
+          <ContactItem imageSrc='' label='Ademir' />
+          <ContactItem imageSrc='' label='Natanael' />
         </div>
 
       ) : (

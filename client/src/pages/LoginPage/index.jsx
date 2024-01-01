@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'
 
 import './index.css'
 
@@ -10,8 +11,19 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    navigate('/chats')
-    console.log('Login clicked');
+    const body = {
+      email: email,
+      password: password,
+    }
+
+    axios.post('http://localhost:8080/login', body)
+      .then(response => {
+        sessionStorage.setItem("sessionId", response.data.id);
+        navigate('/chats')
+      })
+      .catch(error => {
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
   };
 
   return (

@@ -6,7 +6,7 @@ const ContactItem = ({ imageSrc, label }) => {
   return (
     <div className='contact-item'>
       <div className='content'>
-        <img src={imageSrc} className='contact-image' />
+      <img src={imageSrc} className='contact-image' />
         <span className='contact-label'>{label}</span>
       </div>
 

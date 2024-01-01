@@ -1,3 +1,11 @@
+.base-container {
+  background-color: #424242;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .header-container {
   background-color: #424242;
   color: white;
@@ -18,4 +26,13 @@
 
 .spacer {
   width: 20px;
+}
+
+.circle {
+  height: 20px;
+  width: 20px;
+  padding: 4px;
+  border-radius: 50%;
+  background-color: #242424;
+  margin-right: 10px;
 }
