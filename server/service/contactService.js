@@ -1,5 +1,13 @@
-const { User, Contact, sequelize } = require('../models');
+const { User, Contact, sequelize, Sequelize } = require('../models');
 const { Op } = require("sequelize");
+
+const isEmpty = (obj) => {
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop))
+      return false;
+  }
+  return JSON.stringify(obj) === JSON.stringify({});
+}
 
 const addContact = async (req, res) => {
   const body = req.body
@@ -8,25 +16,36 @@ const addContact = async (req, res) => {
     return res.status(400).send({ message: 'Empty request body' })
   }
 
-  if (body.email === undefined) {
-    return res.status(400).send({ message: "Missing \"email\" property" })
+  if (body.contactId === undefined) {
+    return res.status(400).send({ message: "Missing \"contactId\" property" })
   }
 
   if (body.currentId === undefined) {
     return res.status(400).send({ message: "Missing \"currentId\" property" })
   }
 
-  let searchContact = await User.findOne({ where: { email: body.email } })
+  let contact = await Contact.findOne({
+    where: {
+      userId: body.currentId,
+      contactId: body.contactId
+    }
+  })
+
+  if (contact !== null) {
+    return res.status(400).send({ message: "Contact already added" })
+  }
+
+  let searchContact = await User.findOne({ where: { id: body.contactId } })
 
   if (searchContact !== null) {
     await Contact.create({
-      userId: currentId,
-      contactId: searchContact.id,
+      userId: body.currentId,
+      contactId: body.contactId,
     })
 
     await Contact.create({
-      userId: searchContact.id,
-      contactId: currentId,
+      userId: body.contactId,
+      contactId: body.currentId,
     })
 
     return res.status(200).send({
@@ -34,7 +53,7 @@ const addContact = async (req, res) => {
       'email': searchContact.email
     });
   } else {
-    return res.status(404).send({ message: 'User not found' })
+    return res.status(404).send({ message: 'Contact not found' })
   }
 }
 
@@ -56,7 +75,8 @@ const searchContact = async (req, res) => {
 
   let users = await User.findAll({
     where: {
-      email: { [Op.like]: `%${query}%`, [Op.not]: `${body.currentId}` }
+      email: { [Op.like]: `${query}%` },
+      id: { [Op.not]: `${body.currentId}` }
     }
   })
 
@@ -89,7 +109,7 @@ const searchMyContacts = async (req, res) => {
     return res.status(400).send({ message: "Missing \"currentId\" property" })
   }
 
-  let contacts = await sequelize.query(sql`SELECT * FROM Users U JOIN Contacts C on U.id = C.contactId WHERE (email LIKE %${query}% OR name LIKE %${query}%) AND (id <> ${body.currentId})`);
+  let contacts = await sequelize.query(`SELECT * FROM Users U JOIN Contacts C on U.id = C.contactId WHERE (email LIKE %${query}% OR name LIKE %${query}%) AND (id <> ${body.currentId})`);
 
   if (contacts !== null) {
     return res.status(200).send(contacts.map(e => {
@@ -115,14 +135,22 @@ const findMyContacts = async (req, res) => {
     return res.status(400).send({ message: "Missing \"currentId\" property" })
   }
 
-  let contacts = await sequelize.query(sql`SELECT * FROM Users U JOIN Contacts C on U.id = C.contactId WHERE (id <> ${body.currentId})`);
+  let contacts = await Contact.findAll({
+    where: {
+      userId: body.currentId
+    },
+    include: [{
+      model: User,
+      as: 'User'
+    }],
+  })
 
   if (contacts !== null) {
     return res.status(200).send(contacts.map(e => {
       return {
-        'id': e.id,
-        'name': e.name,
-        'email': e.email
+        'id': e.User.id,
+        'name': e.User.name,
+        'email': e.User.email
       }
     }));
   } else {

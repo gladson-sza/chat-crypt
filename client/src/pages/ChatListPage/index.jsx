@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import ContactListModal from './../../components/ContactListModal';
+import React, { useState, useEffect } from 'react';
 import ChatListHeader from '../../components/ChatListHeader';
 import ContactItem from '../../components/ContactItem';
 import Modal from '../../components/Modal';
+import axios from 'axios';
 
 import './index.css';
 
@@ -13,6 +13,25 @@ const ChatsPage = () => {
   const [chats, setChats] = useState([]);
   const [showContactList, setShowContactList] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    const currentId = sessionStorage.getItem("sessionId");
+
+    console.log('APARECI')
+
+    axios.post('http://localhost:8080/contacts/my', { currentId: currentId, })
+      .then(response => {
+        console.log(response.data)
+        setChats(response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleNewChat = () => {
     setShowContactList(true);
@@ -37,7 +56,6 @@ const ChatsPage = () => {
   }
 
   const handleAddNewContact = () => {
-    console.log('Heheh')
     setIsModalOpen(!isModalOpen);
   }
 
@@ -47,32 +65,14 @@ const ChatsPage = () => {
       <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} onAddNewContact={handleAddNewContact} />
       {chats.length === 0 ? (
         <div>
-          <p>Search a contact to start a new conversation</p>
-          <ContactItem imageSrc='' label='Gladson' />
-          <ContactItem imageSrc='' label='Ademir' />
-          <ContactItem imageSrc='' label='Natanael' />
+          <p>Add a contact to start a new conversation</p>
         </div>
-
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
-            <li key={index} className="chat-item">
-              <button className="new-message-button">New Message</button>
-              <div className="contact-info">
-                <img
-                  src={chat.contact.photo}
-                  alt={chat.contact.name}
-                  className="contact-photo"
-                />
-                <span>{chat.contact.name}</span>
-              </div>
-            </li>
+            <li key={index}><ContactItem label={chat.name} onClick={() => {navigate('/chat')}} /></li>
           ))}
         </ul>
-      )}
-
-      {showContactList && (
-        <ContactListModal onSelect={handleContactSelected} />
       )}
     </div>
   );

@@ -1,12 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import './index.css';
 
-const ContactItem = ({ imageSrc, label }) => {
+const ContactItem = ({ label, onClick }) => {
   return (
-    <div className='contact-item'>
+    <div className='contact-item' onClick={onClick}>
       <div className='content'>
-      <img src={imageSrc} className='contact-image' />
         <span className='contact-label'>{label}</span>
       </div>
 
@@ -14,11 +12,6 @@ const ContactItem = ({ imageSrc, label }) => {
     </div>
 
   );
-};
-
-ContactItem.propTypes = {
-  imageSrc: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
 };
 
 export default ContactItem;

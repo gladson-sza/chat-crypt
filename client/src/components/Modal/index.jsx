@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios'
+import ContactItem from '../ContactItem';
 import './index.css';
 
 const Modal = ({ onCloseModal }) => {
@@ -6,8 +8,34 @@ const Modal = ({ onCloseModal }) => {
   const [searchResults, setSearchResults] = useState([]);
 
   const handleSearch = () => {
-    setSearchResults([]);
+    const currentId = sessionStorage.getItem("sessionId");
+
+    axios.post(`http://localhost:8080/contacts/search?q=${searchQuery}`, {
+      currentId: currentId,
+    }).then(response => {
+      console.log(response.data)
+      setSearchResults(response.data);
+    })
+    .catch(error => {
+      console.error('Erro ao fazer a solicitação:', error.response.data);
+    });
+    
   };
+
+
+  const handleAddContact = (contactId) => {
+    const currentId = sessionStorage.getItem("sessionId");
+
+    axios.post(`http://localhost:8080/contact/add`, {
+      currentId: currentId,
+      contactId: contactId
+    }).then(response => {
+      onCloseModal()
+    })
+    .catch(error => {
+      console.error('Erro ao fazer a solicitação:', error.response.data);
+    });
+  }
 
   return (
     <div className='modal-overlay'>
@@ -28,8 +56,8 @@ const Modal = ({ onCloseModal }) => {
           <button onClick={handleSearch}>Search</button>
         </div>
         <ul>
-          {searchResults.map((result, index) => (
-            <li key={index}>{result}</li>
+          {searchResults.map((result) => (
+            <ContactItem label={result.name} onClick={() => handleAddContact(result.id)}/>
           ))}
         </ul>
       </div>
