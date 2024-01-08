@@ -7,7 +7,7 @@ const {
 const initSocketIo = (expressServer, port, admin) => {
   const io = new Server(expressServer, {
     cors: {
-      origin: [`http://localhost:${port}`, `http://127.0.0.1:${port}`]
+      origin: [`http://localhost:${port}`, `http://127.0.0.1:${port}`, 'http://localhost:5173', 'https://localhost:5173']
     }
   });
   io.on('connection', onUserConnection(io, admin));
@@ -17,13 +17,16 @@ const initSocketIo = (expressServer, port, admin) => {
 const onUserConnection = (io, admin) => socket => {
   console.log(`User ${socket.id} connected`);
 
-  socket.emit('message', buildMsg(admin, "Welcome to Chat App!"));
+  socket.emit('message', buildMsg(admin, 'Bem vindo!'));
 
   socket.on('enterRoom', onEnterRoom(io, socket, admin));
 
   socket.on('disconnect', onUserDisconnection(io, socket, admin))
 
-  socket.on('message', onMessage(io, socket))
+  socket.on('message', (message) => {
+    console.log('Received message:', message);
+    io.emit('message', message);
+  })
 
   socket.on('activity', onActivity(socket));
 }

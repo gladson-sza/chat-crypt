@@ -15,10 +15,12 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "axios": "^1.6.3",
     "crypt-js": "^1.0.4",
+    "crypto-js": "^4.2.0",
     "font-awesome": "^4.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.0"
+    "react-router-dom": "^6.21.0",
+    "socket.io-client": "^4.7.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

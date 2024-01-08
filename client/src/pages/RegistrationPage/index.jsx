@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import axios from 'axios'
+
 import './index.css'
 
 const RegistrationPage = () => {
@@ -8,9 +10,44 @@ const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const validateEmail = (str) => {
+    return String(str)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
   const handleRegistration = () => {
-    // Perform your registration logic here (e.g., send data to a server)
-    console.log('Registration clicked');
+    if (name === '') {
+      alert('Nome vazio')
+      return;
+    }
+
+    if (email === '' || !validateEmail(email)) {
+      alert('Email incorreto')
+      return;
+    }
+
+    if (password === '' || password.length < 8) {
+      alert('Sua senha não pode ter menos de 8 caracteres')
+      return;
+    }
+
+    const body = {
+      name: name,
+      email: email,
+      password: password
+    }
+
+    axios.post('http://localhost:8080/user', body)
+      .then(_ => {
+        navigate('/login')
+      })
+      .catch(error => {
+        alert('Email já registrado')
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
   };
 
   return (
