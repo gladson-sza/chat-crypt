@@ -37,6 +37,7 @@
 
 .other-message {
   align-self: flex-start;
+  color: black;
   background-color: #e0e0e0;
   border-radius: 8px;
   padding: 8px;

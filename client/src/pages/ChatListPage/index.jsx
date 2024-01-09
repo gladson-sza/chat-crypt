@@ -11,13 +11,10 @@ import { useNavigate } from 'react-router-dom';
 const ChatsPage = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState([]);
-  const [showContactList, setShowContactList] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchData = async () => {
     const currentId = sessionStorage.getItem("sessionId");
-
-    console.log('APARECI')
 
     axios.post('http://localhost:8080/contacts/my', { currentId: currentId, })
       .then(response => {
@@ -33,20 +30,6 @@ const ChatsPage = () => {
     fetchData();
   }, []);
 
-  const handleNewChat = () => {
-    setShowContactList(true);
-  };
-
-  const handleContactSelected = (contact) => {
-    const newChat = {
-      contact,
-      messages: [],
-    };
-
-    setChats([...chats, newChat]);
-    setShowContactList(false);
-  };
-
   const handleOnLogout = () => {
     navigate('/login')
   }
@@ -57,6 +40,11 @@ const ChatsPage = () => {
 
   const handleAddNewContact = () => {
     setIsModalOpen(!isModalOpen);
+  }
+
+  const handleOnContactClick = (socketId) => {
+    const currentId = sessionStorage.getItem("sessionId");
+    navigate('/chat')
   }
 
   return (
@@ -70,7 +58,7 @@ const ChatsPage = () => {
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
-            <li key={index}><ContactItem label={chat.name} onClick={() => {navigate('/chat')}} /></li>
+            <li key={index}><ContactItem label={chat.name} onClick={() => {handleOnContactClick()}} /></li>
           ))}
         </ul>
       )}

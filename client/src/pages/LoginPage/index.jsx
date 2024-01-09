@@ -22,6 +22,7 @@ const LoginPage = () => {
         navigate('/chats')
       })
       .catch(error => {
+        alert('Email ou senha incorretos')
         console.error('Erro ao fazer a solicitação:', error.response.data);
       });
   };

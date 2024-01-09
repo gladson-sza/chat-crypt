@@ -10,7 +10,7 @@ const ADMIN = "Admin";
 
 db.sequelize
   .sync()
-  .then((req) => {
+  .then((_) => {
     initExpressServer(PORT).then(result => {
       initSocketIo(result.expressServer, PORT, ADMIN);
       initRoutes(result.app)
