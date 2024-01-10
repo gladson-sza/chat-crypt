@@ -41,11 +41,14 @@ const ChatPage = () => {
   };
 
   const handleSendMessage = () => {
-    const encryptedMessage = encryptMessage(newMessage);
-    const currentId = sessionStorage.getItem("sessionId");
-    socketRef.current.emit('message', {text: encryptedMessage, userId: currentId});
-    setNewMessage('');
+    if (newMessage.trim() !== '') {
+      const encryptedMessage = encryptMessage(newMessage);
+      const currentId = sessionStorage.getItem("sessionId");
+      socketRef.current.emit('message', { text: encryptedMessage, userId: currentId });
+      setNewMessage('');
+    }
   };
+
 
   const handleBackClick = () => {
     navigate('/chats');
