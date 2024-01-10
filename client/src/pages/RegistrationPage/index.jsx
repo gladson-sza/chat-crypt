@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import axios from 'axios'
 
 import './index.css'
 
 const RegistrationPage = () => {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,9 +43,8 @@ const RegistrationPage = () => {
     }
 
     axios.post('http://localhost:8080/user', body)
-      .then(_ => {
-        navigate('/login')
-      })
+      // TODO: then, output pretty window showing success registration message
+      .then(_ => navigate('/login'))
       .catch(error => {
         alert('Email já registrado')
         console.error('Erro ao fazer a solicitação:', error.response.data);
