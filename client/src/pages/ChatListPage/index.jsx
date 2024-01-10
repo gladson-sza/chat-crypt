@@ -40,6 +40,7 @@ const ChatsPage = () => {
 
   const handleAddNewContact = () => {
     setIsModalOpen(!isModalOpen);
+    fetchData();
   }
 
   const handleOnContactClick = (socketId) => {
