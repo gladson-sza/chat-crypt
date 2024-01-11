@@ -5,7 +5,7 @@ import './index.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
-const ChatListHeader = ({ onLogout, onSearch, onAddNewContact }) => {
+const ChatListHeader = ({ onLogout, onSearch, onAddNewContact, onCreateGroup }) => {
   return (
     <div className="base-container">
       <div className="header-container">
@@ -13,6 +13,7 @@ const ChatListHeader = ({ onLogout, onSearch, onAddNewContact }) => {
         <div className='spacer'></div>
         <SearchBar onSearch={onSearch} />
       </div>
+      <button onClick={onCreateGroup}>Criar Grupo</button>
       <FontAwesomeIcon className='circle' onClick={onAddNewContact} icon={faPlus} />
 
     </div>
