@@ -32,11 +32,11 @@ const ChatPage = () => {
     };
   }, []);
 
-  const encryptMessage = (message) => CryptoJS.AES.encrypt(message, getAesKey()).toString();
+  const encryptMessage = (message) => CryptoJS.TripleDES.encrypt(message, getSharedKey()).toString();
 
-  const decryptMessage = (encrypted) => CryptoJS.AES.decrypt(encrypted, getAesKey()).toString(CryptoJS.enc.Utf8);
+  const decryptMessage = (encrypted) => CryptoJS.TripleDES.decrypt(encrypted, getSharedKey()).toString(CryptoJS.enc.Utf8);
 
-  const getAesKey = () => {
+  const getSharedKey = () => {
     return 'NErCsY8LIG+qPweBswMFPlmJTZa0WzKbnzKhEm539HjUd50kJarYCYHFLLlumyU0';
   };
 
