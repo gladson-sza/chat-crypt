@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios'
 import ContactItem from '../ContactItem';
 import './index.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
-const Modal = ({ onCloseModal }) => {
+const NewContactModal = ({ onToggleModal, onNewContactAdded }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
@@ -16,10 +18,10 @@ const Modal = ({ onCloseModal }) => {
       console.log(response.data)
       setSearchResults(response.data);
     })
-    .catch(error => {
-      console.error('Erro ao fazer a solicitação:', error.response.data);
-    });
-    
+      .catch(error => {
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
+
   };
 
 
@@ -30,19 +32,18 @@ const Modal = ({ onCloseModal }) => {
       currentId: currentId,
       contactId: contactId
     }).then(response => {
-      onCloseModal()
+      onNewContactAdded()
     })
-    .catch(error => {
-      console.error('Erro ao fazer a solicitação:', error.response.data);
-    });
+      .catch(error => {
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
   }
 
   return (
     <div className='modal-overlay'>
       <div className='modal'>
         <div className='modal-close-container'>
-          
-          <div className='close-button' onClick={onCloseModal}>X</div>
+          <FontAwesomeIcon onClick={onToggleModal} icon={faXmark} />
         </div>
         <div className='modal-spacer'></div>
         <div className='modal-search'>
@@ -57,7 +58,9 @@ const Modal = ({ onCloseModal }) => {
         </div>
         <ul>
           {searchResults.map((result) => (
-            <ContactItem label={result.name} onClick={() => handleAddContact(result.id)}/>
+            <li key={result.id}>
+              <ContactItem label={result.name} onClick={() => handleAddContact(result.id)} />
+            </li>
           ))}
         </ul>
       </div>
@@ -65,4 +68,4 @@ const Modal = ({ onCloseModal }) => {
   );
 };
 
-export default Modal;
+export default NewContactModal;

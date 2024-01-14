@@ -1,13 +1,6 @@
 const CryptoJS = require("crypto-js");
 const { User } = require('../models');
-
-const isEmpty = (obj) => {
-  for (var prop in obj) {
-    if (obj.hasOwnProperty(prop))
-      return false;
-  }
-  return JSON.stringify(obj) === JSON.stringify({});
-}
+const { isEmpty } = require("./util");
 
 const toDatabasePassword = (password, createdAt) => {
   return CryptoJS.SHA512(`${password}${createdAt}`).toString()

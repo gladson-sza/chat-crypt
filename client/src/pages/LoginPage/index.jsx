@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getPublicKey } from '../../keys'
 import axios from 'axios'
 
 import './index.css'
@@ -18,8 +19,16 @@ const LoginPage = () => {
 
     axios.post('http://localhost:8080/login', body)
       .then(response => {
-        sessionStorage.setItem("sessionId", response.data.id);
-        navigate('/chats')
+        const currentId = response.data.id
+        sessionStorage.setItem("sessionId", currentId)
+        const pKey = getPublicKey(currentId)
+
+        axios.post('http://localhost:8080/key', { currentId: currentId, publicKey: pKey }).then(
+          navigate('/chats')
+        ).catch(error => {
+          alert('Não foi possível se conectar ao servidor')
+          console.error('Erro ao fazer a solicitação:', error);
+        });
       })
       .catch(error => {
         alert('Email ou senha incorretos')

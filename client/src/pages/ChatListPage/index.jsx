@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ChatListHeader from '../../components/ChatListHeader';
 import ContactItem from '../../components/ContactItem';
-import Modal from '../../components/Modal';
-import ModalGroup from '../../components/ModalGroup';
+import NewContactModal from '../../components/NewContactModal';
+import NewChatModal from '../../components/NewChatModal';
 import axios from 'axios';
 
 import './index.css';
@@ -12,11 +12,14 @@ import { useNavigate } from 'react-router-dom';
 const ChatsPage = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalGroupOpen, setIsModalGroupOpen] = useState(false);
+  const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+  const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
 
   const fetchData = async () => {
     const currentId = sessionStorage.getItem("sessionId");
+    if (currentId === null) {
+      navigate('/login');
+    }
 
     axios.post('http://localhost:8080/contacts/my', { currentId: currentId, })
       .then(response => {
@@ -33,44 +36,44 @@ const ChatsPage = () => {
   }, []);
 
   const handleOnLogout = () => {
+    sessionStorage.setItem("sessionId", null);
     navigate('/login')
   }
 
-  const handleOnSearch = (query) => {
-    console.log(query)
+  const toggleNewChatModal = () => setIsNewChatModalOpen(!isNewChatModalOpen);
+  const toogleAddContactModal = () => setIsAddContactModalOpen(!isAddContactModalOpen)
+
+  const onNewContactAdded = () => {
+    toogleAddContactModal()
+    fetchData()
   }
 
-  const handleAddNewContact = () => {
-    setIsModalOpen(!isModalOpen);
-    fetchData();
+  const onNewChatCreated = () => {
+    toggleNewChatModal()
+    fetchData()
   }
 
-  const handleOnContactClick = (socketId) => {
-    const currentId = sessionStorage.getItem("sessionId");
-    navigate('/chat')
-  }
+  const handleOnChatClicked = (chatId) => {
+    console.log(chatId)
 
-  const handleCreateGroup = () => {
-    setIsModalGroupOpen(!isModalGroupOpen);
-  }
-
-  const handleCreateNewGroup = () => {
-    setIsModalGroupOpen(!isModalGroupOpen);
+    // const currentId = sessionStorage.getItem("sessionId");
+    // navigate('/chat')
   }
 
   return (
     <div className="chats-container">
-      {isModalGroupOpen && <ModalGroup onCloseModal={handleCreateNewGroup} contactList={chats} />}
-      {isModalOpen && <Modal onCloseModal={handleAddNewContact} />}
-      <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} onCreateGroup={handleCreateGroup} onAddNewContact={handleAddNewContact} />
+      {isNewChatModalOpen && <NewChatModal onToggleModal={toggleNewChatModal} onNewChatCreated={onNewChatCreated} />}
+      {isAddContactModalOpen && <NewContactModal onToggleModal={toogleAddContactModal} onNewContactAdded={onNewContactAdded} />}
+
+      <ChatListHeader onLogout={handleOnLogout} onNewChat={toggleNewChatModal} onAddNewContact={toogleAddContactModal} />
       {chats.length === 0 ? (
         <div>
-          <p>Add a contact to start a new conversation</p>
+          <p>Adicione um contato e crie um novo chat</p>
         </div>
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
-            <li key={index}><ContactItem label={chat.name} onClick={() => { handleOnContactClick() }} /></li>
+            <li key={index}><ContactItem label={chat.name} onClick={() => { handleOnChatClicked(chat.id) }} /></li>
           ))}
         </ul>
       )}

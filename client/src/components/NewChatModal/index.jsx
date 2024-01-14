@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ContactItem from '../ContactItem';
 import './index.css';
 
-const ModalGroup = ({ onCloseModal, contactList }) => {
+const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [checkedContacts, setCheckedContacts] = useState([]);
+  const [contactList, setContactList] = useState([])
 
   const handleCheckboxChange = (event) => {
     const contactId = event.target.value;
@@ -19,6 +20,26 @@ const ModalGroup = ({ onCloseModal, contactList }) => {
     }
   };
 
+  const fetchData = async () => {
+    const currentId = sessionStorage.getItem("sessionId");
+    if (currentId === null) {
+      navigate('/login');
+    }
+
+    axios.post('http://localhost:8080/contacts/my', { currentId: currentId, })
+      .then(response => {
+        console.log(response.data)
+        setContactList(response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleCreateGroup = () => {
     console.log('Checked Contacts:', checkedContacts);
 
@@ -30,7 +51,7 @@ const ModalGroup = ({ onCloseModal, contactList }) => {
     <div className='modal-overlay'>
       <div className='modal'>
         <div className='modal-close-container'>
-          <div className='close-button' onClick={onCloseModal}>X</div>
+          <div className='close-button' onClick={onToggleModal}>X</div>
         </div>
         <ul>
           {contactList.map((result) => (
@@ -51,4 +72,4 @@ const ModalGroup = ({ onCloseModal, contactList }) => {
   );
 };
 
-export default ModalGroup;
+export default NewChatModal;

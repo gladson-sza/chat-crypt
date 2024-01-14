@@ -15,13 +15,19 @@ const ChatPage = () => {
   const socketRef = useRef();
 
   useEffect(() => {
+    const chatId = sessionStorage.getItem("chatId");
+    if (chatId === null) {
+      navigate('/chats');
+      return;
+    }
+
     socketRef.current = io('ws://localhost:8080');
     socketRef.current.connect();
-
     socketRef.current.on('message', (message) => {
       console.log(message)
       if (message.name !== 'Admin') {
         const currentId = sessionStorage.getItem("sessionId");
+
         const decryptedMessage = decryptMessage(message.text);
         setMessages((prevMessages) => [...prevMessages, { text: decryptedMessage, isUser: currentId == message.userId }]);
       }
@@ -30,6 +36,7 @@ const ChatPage = () => {
     return () => {
       socketRef.current.disconnect();
     };
+
   }, []);
 
   const encryptMessage = (message) => CryptoJS.TripleDES.encrypt(message, getSharedKey()).toString();

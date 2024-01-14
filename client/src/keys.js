@@ -33,4 +33,4 @@ const getPublicKey = (userId) => {
   return key;
 };
 
-export { getPrivateKey, getPublicKey, silentGenerateKeyPair };
+export { getPrivateKey, getPublicKey };
