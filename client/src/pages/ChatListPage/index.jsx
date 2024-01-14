@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ChatListHeader from '../../components/ChatListHeader';
 import ContactItem from '../../components/ContactItem';
 import Modal from '../../components/Modal';
+import ModalGroup from '../../components/ModalGroup';
 import axios from 'axios';
 
 import './index.css';
@@ -12,6 +13,7 @@ const ChatsPage = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalGroupOpen, setIsModalGroupOpen] = useState(false);
 
   const fetchData = async () => {
     const currentId = sessionStorage.getItem("sessionId");
@@ -48,10 +50,19 @@ const ChatsPage = () => {
     navigate('/chat')
   }
 
+  const handleCreateGroup = () => {
+    setIsModalGroupOpen(!isModalGroupOpen);
+  }
+
+  const handleCreateNewGroup = () => {
+    setIsModalGroupOpen(!isModalGroupOpen);
+  }
+
   return (
     <div className="chats-container">
+      {isModalGroupOpen && <ModalGroup onCloseModal={handleCreateNewGroup} contactList={chats} />}
       {isModalOpen && <Modal onCloseModal={handleAddNewContact} />}
-      <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} onAddNewContact={handleAddNewContact} />
+      <ChatListHeader onLogout={handleOnLogout} onSearch={handleOnSearch} onCreateGroup={handleCreateGroup} onAddNewContact={handleAddNewContact} />
       {chats.length === 0 ? (
         <div>
           <p>Add a contact to start a new conversation</p>
@@ -59,7 +70,7 @@ const ChatsPage = () => {
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
-            <li key={index}><ContactItem label={chat.name} onClick={() => {handleOnContactClick()}} /></li>
+            <li key={index}><ContactItem label={chat.name} onClick={() => { handleOnContactClick() }} /></li>
           ))}
         </ul>
       )}
