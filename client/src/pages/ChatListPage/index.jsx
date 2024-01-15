@@ -21,10 +21,10 @@ const ChatsPage = () => {
       navigate('/login');
     }
 
-    axios.post('http://localhost:8080/contacts/my', { currentId: currentId, })
+    axios.post('http://localhost:8080/chat/my', { currentId: currentId })
       .then(response => {
         console.log(response.data)
-        setChats(response.data);
+        // setChats(response.data);
       })
       .catch(error => {
         console.error('Erro ao fazer a solicitação:', error.response.data);

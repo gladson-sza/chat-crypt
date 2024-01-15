@@ -4,7 +4,6 @@ import ContactItem from '../ContactItem';
 import './index.css';
 
 const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [checkedContacts, setCheckedContacts] = useState([]);
   const [contactList, setContactList] = useState([])
 
@@ -12,7 +11,6 @@ const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
     const contactId = event.target.value;
     const isChecked = event.target.checked;
 
-    // Update the checkedContacts array based on the checkbox change
     if (isChecked) {
       setCheckedContacts(prevChecked => [...prevChecked, contactId]);
     } else {
@@ -26,7 +24,7 @@ const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
       navigate('/login');
     }
 
-    axios.post('http://localhost:8080/contacts/my', { currentId: currentId, })
+    axios.post('http://localhost:8080/contacts/my', { currentId: currentId })
       .then(response => {
         console.log(response.data)
         setContactList(response.data);
@@ -40,11 +38,25 @@ const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
     fetchData();
   }, []);
 
-  const handleCreateGroup = () => {
-    console.log('Checked Contacts:', checkedContacts);
+  const hangleCreateChat = () => {
+    const currentId = sessionStorage.getItem("sessionId");
+    if (currentId === null) {
+      navigate('/login');
+    }
 
-    // Now you have the array of checked contact IDs (checkedContacts)
-    // You can use this array for further processing or API calls.
+    console.log('Checked Contacts:', checkedContacts);
+    const contactIds = checkedContacts.map(e => parseInt(e))
+
+    if (checkedContacts.length > 0) {
+      axios.post('http://localhost:8080/chat', { currentId: currentId, contactIds: contactIds })
+        .then(response => {
+          console.log(response.data)
+          onToggleModal()
+        })
+        .catch(error => {
+          console.error('Erro ao fazer a solicitação:', error.response.data);
+        });
+    }
   };
 
   return (
@@ -66,7 +78,7 @@ const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
           ))}
         </ul>
 
-        <button onClick={handleCreateGroup}>Criar</button>
+        <button onClick={hangleCreateChat}>Criar</button>
       </div>
     </div>
   );

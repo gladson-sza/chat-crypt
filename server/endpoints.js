@@ -2,6 +2,7 @@
 const { createUser, login } = require('./service/authService.js')
 const { addContact, searchContact, searchMyContacts, findMyContacts } = require('./service/contactService.js');
 const { updateKey } = require('./service/cryptService.js');
+const { createChat, findMyChats } = require('./service/chatService.js')
 
 const initEndPoints = (app) => {
   app.get('/', async (req, res) => {
@@ -40,6 +41,16 @@ const initEndPoints = (app) => {
 
   app.post('/key', async (req, res) => {
     const result = await updateKey(req, res)
+    return result
+  })
+
+  app.post('/chat', async (req, res) => {
+    const result = await createChat(req, res)
+    return result
+  })
+
+  app.post('/chat/my', async (req, res) => {
+    const result = await findMyChats(req, res)
     return result
   })
 }
