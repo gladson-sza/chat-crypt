@@ -165,7 +165,8 @@ const findMyContacts = async (req, res) => {
       return {
         'id': e.User.id,
         'name': e.User.name,
-        'email': e.User.email
+        'email': e.User.email,
+        'publicKey': e.User.publicKey
       }
     }));
   } else {

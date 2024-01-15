@@ -29,7 +29,7 @@ const initEndPoints = (app) => {
     return result
   })
 
-  app.post('/contacts/my/', async (req, res) => {
+  app.post('/contacts/my', async (req, res) => {
     const result = await findMyContacts(req, res)
     return result
   })

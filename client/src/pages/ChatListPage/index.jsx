@@ -16,20 +16,35 @@ const ChatsPage = () => {
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
 
+  const fetchChats = async (currentId) => {
+    axios.post('http://localhost:8080/chat/my', { currentId: currentId })
+    .then(response => {
+      console.log(response.data)
+      setChats(response.data);
+    })
+    .catch(error => {
+      console.error('Erro ao fazer a solicitação:', error.response.data);
+    });
+  }
+
+  const fetchKeys = async (currentId) => {
+    axios.post('http://localhost:8080/key/get', { currentId: currentId })
+    .then(response => {
+      console.log(response.data)
+    })
+    .catch(error => {
+      console.error('Erro ao fazer a solicitação:', error.response.data);
+    });
+  }
+
   const fetchData = async () => {
     const currentId = sessionStorage.getItem("sessionId");
     if (currentId === null) {
       navigate('/login');
     }
 
-    axios.post('http://localhost:8080/chat/my', { currentId: currentId })
-      .then(response => {
-        console.log(response.data)
-        setChats(response.data);
-      })
-      .catch(error => {
-        console.error('Erro ao fazer a solicitação:', error.response.data);
-      });
+    await fetchChats(currentId)
+    await fetchKeys(currentId)
   };
 
   useEffect(() => {

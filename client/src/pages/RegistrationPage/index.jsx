@@ -31,8 +31,8 @@ const RegistrationPage = () => {
       return;
     }
 
-    if (password === '' || password.length < 8) {
-      alert('Sua senha não pode ter menos de 8 caracteres')
+    if (password === '' || password.length < 4) {
+      alert('Sua senha não pode ter menos de 4 caracteres')
       return;
     }
 
@@ -44,7 +44,21 @@ const RegistrationPage = () => {
 
     axios.post('http://localhost:8080/user', body)
       // TODO: then, output pretty window showing success registration message
-      .then(_ => navigate('/login'))
+      .then(_ => {
+        const currentId = response.data.id
+        sessionStorage.setItem("sessionId", currentId)
+        const pKey = getPublicKey(currentId)
+
+        axios.post('http://localhost:8080/key', { currentId: currentId, publicKey: pKey }).then(response => {
+          console.log(response.data);
+        }
+        ).catch(error => {
+          alert('Não foi possível se conectar ao servidor')
+          console.error('Erro ao fazer a solicitação:', error);
+        });
+
+        navigate('/login')
+      })
       .catch(error => {
         alert('Email já registrado')
         console.error('Erro ao fazer a solicitação:', error.response.data);

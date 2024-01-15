@@ -16,16 +16,19 @@ const updateKey = async (req, res) => {
     return res.status(400).send({ message: "Missing \"publicKey\" property" })
   }
 
-  const user = await User.findOne({ where: { id: body.currentId } })
+  const user = await User.findOne({where: {id: body.currentId}})
   user.publicKey = body.publicKey
-  await user.save()
 
-  return res.status(200).send({ message: 'Public Key update' })
+  const result = await user.save()
+
+  console.log(result)
+
+  return res.status(200).send({ message: 'Public Key update', result: result })
 }
 
 const createExchangeRequest = async (req, res) => {
   const body = req.body
-  const { currentId, sendList, key, chatId } = body
+  const { currentId, sendToId, key, chatId } = body
 
   if (isEmpty(body)) {
     return res.status(400).send({ message: 'Empty request body' })
@@ -35,7 +38,7 @@ const createExchangeRequest = async (req, res) => {
     return res.status(400).send({ message: "Missing \"currentId\" property" })
   }
 
-  if (sendList === undefined) {
+  if (sendToId === undefined) {
     return res.status(400).send({ message: "Missing \"sendList\" property" })
   }
 
@@ -43,21 +46,16 @@ const createExchangeRequest = async (req, res) => {
     return res.status(400).send({ message: "Missing \"key\" property" })
   }
 
-  if (key === undefined) {
+  if (chatId === undefined) {
     return res.status(400).send({ message: "Missing \"chatId\" property" })
   }
 
-  const receivers = sendList.map(e => parseInt(e))
-  const bulkList = receivers.map(e => {
-    return {
-      requesterId: e,
-      senderId: currentId,
-      chatId: chatId,
-      key: key,
-    }
+  const result = await PendenceExchange.create({
+    requesterId: sendToId,
+    senderId: currentId,
+    chatId: chatId,
+    key: key
   })
-
-  const result = await PendenceExchange.bulkInsert(bulkList)
 
   if (result !== null) {
     return res.status(200).send({ message: 'Exchange request created' })

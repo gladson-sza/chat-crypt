@@ -23,8 +23,10 @@ const LoginPage = () => {
         sessionStorage.setItem("sessionId", currentId)
         const pKey = getPublicKey(currentId)
 
-        axios.post('http://localhost:8080/key', { currentId: currentId, publicKey: pKey }).then(
+        axios.post('http://localhost:8080/key', { currentId: currentId, publicKey: pKey }).then(response => {
+          console.log(response.data);
           navigate('/chats')
+        }
         ).catch(error => {
           alert('Não foi possível se conectar ao servidor')
           console.error('Erro ao fazer a solicitação:', error);
@@ -48,7 +50,6 @@ const LoginPage = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
         </div>
 
 

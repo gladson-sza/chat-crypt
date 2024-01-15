@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ContactItem from '../ContactItem';
+import { generateRandomKey, saveChatKey, saveContactPubKey } from '../../keys';
 import './index.css';
 
 const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
@@ -50,11 +51,31 @@ const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
     if (checkedContacts.length > 0) {
       axios.post('http://localhost:8080/chat', { currentId: currentId, contactIds: contactIds })
         .then(response => {
-          console.log(response.data)
-          onToggleModal()
+          /* const chatKey = generateRandomKey()
+          const chatId = response.data.chatId
+
+          contactIds.forEach(cId => {
+  
+            const reqBody = {
+              currentId: currentId,
+              chatId: chatId,
+              key: key,
+              sendList: contactIds,
+            }
+  
+            axios.post('http://localhost:8080/key/send', reqBody).then(response => {
+              console.log(response)
+              saveChatKey(currentId, chatId, key)
+              
+            }).catch(error => {
+              console.log(error.response)
+            })
+          }) */
+          
+          onNewChatCreated()
         })
         .catch(error => {
-          console.error('Erro ao fazer a solicitação:', error.response.data);
+          console.error('Erro ao fazer a solicitação:', error);
         });
     }
   };

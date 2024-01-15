@@ -1,7 +1,7 @@
 import forge from 'node-forge';
 
 const generateSSHKeyPair = (userId) => {
-  const keypair = forge.pki.rsa.generateKeyPair({ bits: 2048 });
+  const keypair = forge.pki.rsa.generateKeyPair({ bits: 1024 });
   const privateKey = forge.pki.privateKeyToPem(keypair.privateKey);
   const publicKey = forge.pki.publicKeyToPem(keypair.publicKey);
 
@@ -34,6 +34,7 @@ const getPublicKey = (userId) => {
 };
 
 const generateRandomKey = () => {
+  const byteBuffer = forge.random.getBytesSync(16);
   const randomKey = forge.util.bytesToHex(byteBuffer);
   return randomKey;
 }
@@ -43,7 +44,16 @@ const saveChatKey = (userId, chatId, key) => {
 }
 
 const getChatKey = (userId, chatId) => {
-  localStorage.getItem(`key.user${userId}.chat.${chatId}`);
+  return localStorage.getItem(`key.user${userId}.chat.${chatId}`);
 }
 
-export { getPrivateKey, getPublicKey, generateRandomKey, saveChatKey, getChatKey };
+const saveContactPubKey = (id, key) => {
+  localStorage.setItem(`key.user${id}.public`, key);
+}
+
+const getContactPubKey = (id) => {
+  return localStorage.setItem(`key.user${id}.public`, key);
+}
+
+
+export { getPrivateKey, getPublicKey, generateRandomKey, saveChatKey, getChatKey, saveContactPubKey, getContactPubKey };
