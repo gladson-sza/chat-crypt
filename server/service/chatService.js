@@ -1,4 +1,4 @@
-const { Chat, ChatMember } = require('../models');
+const { Chat, ChatMember, User } = require('../models');
 const { isEmpty } = require("./util");
 
 const createChat = async (req, res) => {
@@ -71,13 +71,52 @@ const findMyChats = async (req, res) => {
     ]
   });
 
+  console.log(`ID ATUAL\n\n\n${body.currentId}\n\n\n`)
+
   if (chats !== null) {
-    return res.status(200).send(chats.map(e => {
-      return e
-    }));
+    const response = []
+
+    for (let i = 0; i < chats.length; i++) {
+      const c = chats[i]
+
+      const members = await ChatMember.findAll({ where: { chatId: c.id } });
+      const idList = members.map(e => e.memberId).filter(e => e !== parseInt(body.currentId))
+      const userMembers = await User.findAll({ where: { id: idList } });
+      const memberList = userMembers.map(e => e.get({ plain: true }))
+      const groupName = getGroupName(memberList)
+
+      response.push({
+        id: c.id,
+        adminId: c.adminId,
+        isGroup: c.isGroup,
+        name: groupName
+      })
+    }
+
+    return res.status(200).send(response);
   } else {
     return res.status(400).send({ message: 'No user found' })
   }
+}
+
+const getGroupName = (memberList) => {
+  if (memberList.length === 1) {
+    return memberList[0].name
+  }
+
+  const names = memberList.map(e => e.name)
+  let gName = ''
+
+  for (let i = 0; i < names.length || i < 3; i++) {
+    if (i === 2 || i === (names.length - 1)) {
+      gName += `${names[i].split(' ')[0]}`;
+    } else {
+      gName += `${names[i].split(' ')[0]}, `;
+    }
+    
+  }
+
+  return gName;
 }
 
 module.exports = { createChat, findMyChats }

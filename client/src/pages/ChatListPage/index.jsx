@@ -8,6 +8,7 @@ import axios from 'axios';
 import './index.css';
 
 import { useNavigate } from 'react-router-dom';
+import ChatItem from '../../components/ChatItem';
 
 const ChatsPage = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const ChatsPage = () => {
     axios.post('http://localhost:8080/chat/my', { currentId: currentId })
       .then(response => {
         console.log(response.data)
-        // setChats(response.data);
+        setChats(response.data);
       })
       .catch(error => {
         console.error('Erro ao fazer a solicitação:', error.response.data);
@@ -54,9 +55,8 @@ const ChatsPage = () => {
   }
 
   const handleOnChatClicked = (chatId) => {
+    const currentId = sessionStorage.getItem("sessionId");
     console.log(chatId)
-
-    // const currentId = sessionStorage.getItem("sessionId");
     // navigate('/chat')
   }
 
@@ -73,7 +73,7 @@ const ChatsPage = () => {
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
-            <li key={index}><ContactItem label={chat.name} onClick={() => { handleOnChatClicked(chat.id) }} /></li>
+            <li key={index}><ChatItem name={chat.name} onClick={() => { handleOnChatClicked(chat.id) }} /></li>
           ))}
         </ul>
       )}

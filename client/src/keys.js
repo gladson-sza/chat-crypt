@@ -33,4 +33,17 @@ const getPublicKey = (userId) => {
   return key;
 };
 
-export { getPrivateKey, getPublicKey };
+const generateRandomKey = () => {
+  const randomKey = forge.util.bytesToHex(byteBuffer);
+  return randomKey;
+}
+
+const saveChatKey = (userId, chatId, key) => {
+  localStorage.setItem(`key.user${userId}.chat.${chatId}`, key);
+}
+
+const getChatKey = (userId, chatId) => {
+  localStorage.getItem(`key.user${userId}.chat.${chatId}`);
+}
+
+export { getPrivateKey, getPublicKey, generateRandomKey, saveChatKey, getChatKey };

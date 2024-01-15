@@ -1,0 +1,30 @@
+.contact-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.contact-image {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+.contact-label {
+  padding-left: 24px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.content {
+  display: flex;
+  align-content: flex-start;
+  flex-direction: row;
+}
+
+.underline {
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  margin-top: 10px;
+}
