@@ -71,8 +71,6 @@ const findMyChats = async (req, res) => {
     ]
   });
 
-  console.log(`ID ATUAL\n\n\n${body.currentId}\n\n\n`)
-
   if (chats !== null) {
     const response = []
 
@@ -105,15 +103,15 @@ const getGroupName = (memberList) => {
   }
 
   const names = memberList.map(e => e.name)
+  console.log(names)
   let gName = ''
 
-  for (let i = 0; i < names.length || i < 3; i++) {
+  for (let i = 0; i < names.length && i < 3; i++) {
     if (i === 2 || i === (names.length - 1)) {
       gName += `${names[i].split(' ')[0]}`;
     } else {
       gName += `${names[i].split(' ')[0]}, `;
     }
-    
   }
 
   return gName;

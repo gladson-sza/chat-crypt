@@ -16,7 +16,7 @@ const updateKey = async (req, res) => {
     return res.status(400).send({ message: "Missing \"publicKey\" property" })
   }
 
-  const user = await User.findOne({where: {id: body.currentId}})
+  const user = await User.findOne({ where: { id: body.currentId } })
   user.publicKey = body.publicKey
 
   const result = await user.save()
@@ -83,7 +83,13 @@ const getPedingExchanges = async (req, res) => {
   })
 
   if (result !== null) {
-    return res.status(200).send(result)
+    return res.status(200).send(result.map(e => {
+      return {
+        id: e.id,
+        chatId: e.chatId,
+        key: e.key
+      }
+    }))
   } else {
     return res.status(500).send({ message: 'Server couldn\'t create exchange' })
   }
