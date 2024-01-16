@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ChatListHeader from '../../components/ChatListHeader';
-import ContactItem from '../../components/ContactItem';
 import NewContactModal from '../../components/NewContactModal';
 import NewChatModal from '../../components/NewChatModal';
 import axios from 'axios';
+import { saveChatKey, getPrivateKey, decryptWithPrivateKey } from '../../keys';
 
 import './index.css';
 
@@ -18,23 +18,35 @@ const ChatsPage = () => {
 
   const fetchChats = async (currentId) => {
     axios.post('http://localhost:8080/chat/my', { currentId: currentId })
-    .then(response => {
-      console.log(response.data)
-      setChats(response.data);
-    })
-    .catch(error => {
-      console.error('Erro ao fazer a solicitação:', error.response.data);
-    });
+      .then(response => {
+        console.log(response.data)
+        setChats(response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao fazer a solicitação:', error.response.data);
+      });
   }
 
   const fetchKeys = async (currentId) => {
-    axios.post('http://localhost:8080/key/get', { currentId: currentId })
-    .then(response => {
-      console.log(response.data)
-    })
-    .catch(error => {
-      console.error('Erro ao fazer a solicitação:', error.response.data);
-    });
+    try {
+      const result = await axios.post('http://localhost:8080/key/get', { currentId: currentId })
+      const exchanges = result.data
+      for (let i = 0; i < exchanges.length; i++) {
+        try {
+          const { id, chatId, key } = exchanges[i]
+          console.log(exchanges[i])
+          await axios.post('http://localhost:8080/key/confirm', { exchangeId: id })
+          const privateKey = getPrivateKey(currentId)
+          const decryptedKey = decryptWithPrivateKey(privateKey, key)
+          saveChatKey(currentId, chatId, decryptedKey)
+        } catch (e) {
+          console.log('Exchange error: ', e)
+        }
+        
+      }
+    } catch (err) {
+      console.error(err.data)
+    }
   }
 
   const fetchData = async () => {
@@ -69,10 +81,10 @@ const ChatsPage = () => {
     fetchData()
   }
 
-  const handleOnChatClicked = (chatId) => {
-    const currentId = sessionStorage.getItem("sessionId");
-    console.log(chatId)
-    // navigate('/chat')
+  const handleOnChatClicked = (chatId, chatName) => {
+    sessionStorage.setItem("chatId", chatId)
+    sessionStorage.setItem("chatName", chatName)
+    navigate('/chat')
   }
 
   return (
@@ -88,7 +100,7 @@ const ChatsPage = () => {
       ) : (
         <ul className="chat-list">
           {chats.map((chat, index) => (
-            <li key={index}><ChatItem name={chat.name} onClick={() => { handleOnChatClicked(chat.id) }} /></li>
+            <li key={index}><ChatItem name={chat.name} onClick={() => { handleOnChatClicked(chat.id, chat.name) }} /></li>
           ))}
         </ul>
       )}

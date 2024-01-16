@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ContactItem from '../ContactItem';
-import { generateRandomKey, saveChatKey, saveContactPubKey } from '../../keys';
+import { generateRandomKey, saveChatKey, encryptWithPublicKey } from '../../keys';
 import './index.css';
 
 const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
@@ -39,44 +39,43 @@ const NewChatModal = ({ onToggleModal, onNewChatCreated }) => {
     fetchData();
   }, []);
 
-  const hangleCreateChat = () => {
+  const hangleCreateChat = async () => {
     const currentId = sessionStorage.getItem("sessionId");
     if (currentId === null) {
       navigate('/login');
     }
 
-    console.log('Checked Contacts:', checkedContacts);
     const contactIds = checkedContacts.map(e => parseInt(e))
+    const filteredContacts = contactList.filter(e => contactIds.includes(e.id))
 
-    if (checkedContacts.length > 0) {
-      axios.post('http://localhost:8080/chat', { currentId: currentId, contactIds: contactIds })
-        .then(response => {
-          /* const chatKey = generateRandomKey()
-          const chatId = response.data.chatId
+    if (filteredContacts.length > 0) {
+      try {
+        const chatResult = await axios.post('http://localhost:8080/chat', { currentId: currentId, contactIds: contactIds })
+        const chatId = chatResult.data.chatId
+        const chatKey = generateRandomKey()
 
-          contactIds.forEach(cId => {
-  
-            const reqBody = {
-              currentId: currentId,
-              chatId: chatId,
-              key: key,
-              sendList: contactIds,
-            }
-  
-            axios.post('http://localhost:8080/key/send', reqBody).then(response => {
-              console.log(response)
-              saveChatKey(currentId, chatId, key)
-              
-            }).catch(error => {
-              console.log(error.response)
-            })
-          }) */
-          
-          onNewChatCreated()
-        })
-        .catch(error => {
-          console.error('Erro ao fazer a solicitação:', error);
-        });
+
+        for (let i = 0; i < filteredContacts.length; i++) {
+          const contact = filteredContacts[i]
+          const pKey = contact.publicKey
+          const securedKey = encryptWithPublicKey(pKey, chatKey)
+
+          const requestBody = {
+            currentId: currentId,
+            chatId: chatId,
+            key: securedKey,
+            sendToId: contact.id,
+          }
+
+          const reqResult = await axios.post('http://localhost:8080/key/send', requestBody)
+          console.log(reqResult.data)
+        }
+
+        saveChatKey(currentId, chatId, chatKey)
+        onNewChatCreated()
+      } catch (err) {
+        console.error('Error:', err.response.data)
+      }
     }
   };
 

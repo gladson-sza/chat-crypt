@@ -55,5 +55,17 @@ const getContactPubKey = (id) => {
   return localStorage.setItem(`key.user${id}.public`, key);
 }
 
+function encryptWithPublicKey(publicKey, data) {
+  const publicKeyObject = forge.pki.publicKeyFromPem(publicKey);
+  const encrypted = publicKeyObject.encrypt(forge.util.encodeUtf8(data));
+  return forge.util.encode64(encrypted);
+}
 
-export { getPrivateKey, getPublicKey, generateRandomKey, saveChatKey, getChatKey, saveContactPubKey, getContactPubKey };
+function decryptWithPrivateKey(privateKey, encryptedData) {
+  const privateKeyObject = forge.pki.privateKeyFromPem(privateKey);
+  const decrypted = privateKeyObject.decrypt(forge.util.decode64(encryptedData));
+  return forge.util.decodeUtf8(decrypted);
+}
+
+
+export { getPrivateKey, getPublicKey, generateRandomKey, saveChatKey, getChatKey, saveContactPubKey, getContactPubKey, encryptWithPublicKey, decryptWithPrivateKey };

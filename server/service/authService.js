@@ -47,7 +47,9 @@ const createUser = async (req, res) => {
     user.password = toDatabasePassword(user.password, user.createdAt)
     await user.save()
 
-    return res.status(204).send({
+    console.log(`\n\n${user.id}\n\n`)
+
+    return res.status(200).send({
       'id': user.id,
       'name': user.name,
       'email': user.email

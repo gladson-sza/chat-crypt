@@ -4,6 +4,8 @@ import io from 'socket.io-client';
 import CryptoJS from 'crypto-js';
 import './index.css'
 
+import { getChatKey } from '../../keys';
+
 import { useNavigate } from 'react-router-dom';
 
 const ChatPage = () => {
@@ -11,7 +13,7 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [roomName, setRoomName] = useState(''); // Adicione o estado para o nome da sala
+  const [chatName, setChatName] = useState('');
   const socketRef = useRef();
 
   useEffect(() => {
@@ -21,15 +23,24 @@ const ChatPage = () => {
       return;
     }
 
-    socketRef.current = io('ws://localhost:8080');
-    socketRef.current.connect();
-    socketRef.current.on('message', (message) => {
-      console.log(message)
-      if (message.name !== 'Admin') {
-        const currentId = sessionStorage.getItem("sessionId");
+    const chatName = sessionStorage.getItem("chatName")
+    setChatName(chatName)
 
-        const decryptedMessage = decryptMessage(message.text);
-        setMessages((prevMessages) => [...prevMessages, { text: decryptedMessage, isUser: currentId == message.userId }]);
+    socketRef.current = io('ws://localhost:8080');
+    socketRef.current.emit('joinRoom', chatId);
+
+    socketRef.current.on('message', (data) => {
+      console.log(data)
+
+      if (data.type === 'connection') {
+        console.log(data.message)
+      } else {
+        console.log(data)
+        const currentId = sessionStorage.getItem("sessionId");
+        const chatKey = getChatKey(currentId, chatId)
+
+        const decryptedMessage = decryptMessage(data.message, chatKey);
+        setMessages((prevMessages) => [...prevMessages, { text: decryptedMessage, isUser: currentId == data.userId }]);
       }
     });
 
@@ -39,19 +50,18 @@ const ChatPage = () => {
 
   }, []);
 
-  const encryptMessage = (message) => CryptoJS.TripleDES.encrypt(message, getSharedKey()).toString();
+  const encryptMessage = (message, key) => CryptoJS.TripleDES.encrypt(message, key).toString();
 
-  const decryptMessage = (encrypted) => CryptoJS.TripleDES.decrypt(encrypted, getSharedKey()).toString(CryptoJS.enc.Utf8);
-
-  const getSharedKey = () => {
-    return 'NErCsY8LIG+qPweBswMFPlmJTZa0WzKbnzKhEm539HjUd50kJarYCYHFLLlumyU0';
-  };
+  const decryptMessage = (encrypted, key) => CryptoJS.TripleDES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== '') {
-      const encryptedMessage = encryptMessage(newMessage);
       const currentId = sessionStorage.getItem("sessionId");
-      socketRef.current.emit('message', { text: encryptedMessage, userId: currentId });
+      const chatId = sessionStorage.getItem("chatId")
+      const chatKey = getChatKey(currentId, chatId)
+      console.log(chatKey)
+      const encryptedMessage = encryptMessage(newMessage, chatKey);
+      socketRef.current.emit('message', { roomId: chatId, message: encryptedMessage, userId: currentId });
       setNewMessage('');
     }
   };
@@ -63,7 +73,7 @@ const ChatPage = () => {
 
   return (
     <div>
-      <ChatHeader onBackClick={handleBackClick} conversationName='Gladson'></ChatHeader>
+      <ChatHeader onBackClick={handleBackClick} conversationName={chatName}></ChatHeader>
 
       <div className='chat-container'>
         {messages.length === 0 ?

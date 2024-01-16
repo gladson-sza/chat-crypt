@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { getPublicKey } from '../../keys'
+
 import axios from 'axios'
 
 import './index.css'
@@ -43,25 +45,23 @@ const RegistrationPage = () => {
     }
 
     axios.post('http://localhost:8080/user', body)
-      // TODO: then, output pretty window showing success registration message
-      .then(_ => {
+      .then(response => {
         const currentId = response.data.id
         sessionStorage.setItem("sessionId", currentId)
         const pKey = getPublicKey(currentId)
 
         axios.post('http://localhost:8080/key', { currentId: currentId, publicKey: pKey }).then(response => {
           console.log(response.data);
+          navigate('/login')
         }
         ).catch(error => {
           alert('Não foi possível se conectar ao servidor')
           console.error('Erro ao fazer a solicitação:', error);
-        });
-
-        navigate('/login')
+        })
       })
       .catch(error => {
         alert('Email já registrado')
-        console.error('Erro ao fazer a solicitação:', error.response.data);
+        console.error('Erro ao fazer a solicitação:', error);
       });
   };
 
