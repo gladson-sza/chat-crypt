@@ -33,14 +33,26 @@ const ChatPage = () => {
       console.log(data)
 
       if (data.type === 'connection') {
-        console.log(data.message)
+        console.log(data)
+      } else if (data.type === 'history') {
+        console.log(data)
+        const currentId = sessionStorage.getItem("sessionId");
+        const chatKey = getChatKey(currentId, chatId)
+
+        setMessages(data.messages.map(m => {
+          return {
+            isUser: m.userId === currentId,
+            text: decryptMessage(m.message, chatKey),
+            userName: m.userName
+          }
+        }))
       } else {
         console.log(data)
         const currentId = sessionStorage.getItem("sessionId");
         const chatKey = getChatKey(currentId, chatId)
 
         const decryptedMessage = decryptMessage(data.message, chatKey);
-        setMessages((prevMessages) => [...prevMessages, { text: decryptedMessage, isUser: currentId == data.userId }]);
+        setMessages((prevMessages) => [...prevMessages, { text: decryptedMessage, isUser: currentId == data.userId, userName: data.userName }]);
       }
     });
 
@@ -57,11 +69,12 @@ const ChatPage = () => {
   const handleSendMessage = () => {
     if (newMessage.trim() !== '') {
       const currentId = sessionStorage.getItem("sessionId");
+      const userName = sessionStorage.getItem("userName");
       const chatId = sessionStorage.getItem("chatId")
       const chatKey = getChatKey(currentId, chatId)
       console.log(chatKey)
       const encryptedMessage = encryptMessage(newMessage, chatKey);
-      socketRef.current.emit('message', { roomId: chatId, message: encryptedMessage, userId: currentId });
+      socketRef.current.emit('message', { roomId: chatId, message: encryptedMessage, userId: currentId, userName: userName });
       setNewMessage('');
     }
   };
@@ -82,11 +95,13 @@ const ChatPage = () => {
           </div>
           : <div className='message-list'>
             {messages.map((message, index) => (
-              <div
-                key={index}
-                className={message.isUser ? 'user-message' : 'other-message'}
-              >
-                {message.text}
+              <div key={index} className={message.isUser ? 'user-message' : 'other-message'}>
+              <div className={message.isUser ? 'none-display' : 'message-user'}>
+                  {message.userName}:
+                </div>
+                <div>
+                  {message.text}
+                </div>
               </div>
             ))}
           </div>}

@@ -21,6 +21,7 @@ const LoginPage = () => {
       .then(response => {
         const currentId = response.data.id
         sessionStorage.setItem("sessionId", currentId)
+        sessionStorage.setItem("userName", response.data.name)
         const pKey = getPublicKey(currentId)
 
         axios.post('http://localhost:8080/key', { currentId: currentId, publicKey: pKey }).then(response => {
