@@ -65,7 +65,6 @@ body {
 
 .message-input {
   display: flex;
-  align-self: flex-end;
   align-items: center;
   background-color: #424242;
   padding: 10px;

@@ -21,9 +21,7 @@ const updateKey = async (req, res) => {
 
   const result = await user.save()
 
-  console.log(result)
-
-  return res.status(200).send({ message: 'Public Key update', result: result })
+  return res.status(200).send({ message: 'Public Key update', result: {publicKey: result.publicKey} })
 }
 
 const createExchangeRequest = async (req, res) => {
